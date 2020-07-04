@@ -1,0 +1,37 @@
+name: blockchain
+version: 0.0.0.1
+license: MIT
+
+dependencies:
+  - base
+
+executables:
+  dojo-exe:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -Wall
+      - -Werror
+    dependencies:
+      - blockchain
+
+library:
+  exposed-modules: Blockchain
+  source-dirs: src
+  ghc-options:
+    - -Wall
+    - -Werror
+  dependencies:
+    - binary
+    - bytestring
+    - bytestring-conversion
+    - cryptohash-sha256
+    - text
+
+tests:
+  test:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - blockchain
+      - hspec

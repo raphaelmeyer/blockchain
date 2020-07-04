@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "justusadam.language-haskell",
+      "dramforever.vscode-ghc-simple",
+      "hoovercj.haskell-linter",
+      "jcanero.hoogle-vscode",
+      "maxgabriel.brittany"
+    ]
+  },
+  "settings": {
+    "editor.renderWhitespace": "boundary",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  }
+}

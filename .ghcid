@@ -1,0 +1,1 @@
+--command "stack ghci blockchain:lib blockchain:test" --restart "package.yaml" --test "main"
