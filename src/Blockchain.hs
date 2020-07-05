@@ -1,6 +1,5 @@
 module Blockchain where
 
-
 import qualified Crypto.Hash.SHA256            as SHA256
 import qualified Data.ByteString               as BS
 import qualified Data.Text                     as Text
@@ -8,32 +7,44 @@ import qualified Data.Text.Encoding            as Enc
 
 import           Text.Printf                    ( printf )
 
+newtype Blockchain = Blockchain [Block] deriving (Show, Eq)
+
+newBlockchain :: Blockchain
+newBlockchain = Blockchain [genesis]
+
+addBlock :: Blockchain -> Text.Text -> Blockchain
+addBlock (Blockchain blocks) blockData =
+  Blockchain (blocks ++ [newBlock blockData (blockHash (last blocks))])
+
 newtype Hash = Hash BS.ByteString deriving (Eq)
 
 instance Show Hash where
   show (Hash bs) = concatMap (printf "%02x") $ BS.unpack bs
 
-data Block = Block {
-  content :: Text.Text,
-  digest :: Hash,
-  previous :: Hash
-}
+type Nonce = Int
 
--- newBlockchain :: Blockchain
--- addBlock :: Blockchain -> Text.Text -> Blockchain
+data Block = Block {
+  blockContent :: Text.Text,
+  blockHash :: Hash,
+  blockPrevious :: Hash,
+  blockNonce :: Nonce
+} deriving (Show, Eq)
 
 genesis :: Block
 genesis = newBlock (Text.pack "Genesis Block") (Hash BS.empty)
 
 newBlock :: Text.Text -> Hash -> Block
-newBlock c p = Block { content = c, digest = findHash c p 0, previous = p }
+newBlock content previous = Block { blockContent  = content
+                                  , blockHash     = hash
+                                  , blockPrevious = previous
+                                  , blockNonce    = nonce
+                                  }
+  where (hash, nonce) = findNonce content previous 0
 
-type Nonce = Int
-
-findHash :: Text.Text -> Hash -> Nonce -> Hash
-findHash c (Hash p) n = case BS.unpack (BS.take 3 h) of
-  [0, 0, 0] -> Hash h
-  _         -> findHash c (Hash p) (n + 1)
+findNonce :: Text.Text -> Hash -> Nonce -> (Hash, Nonce)
+findNonce content (Hash previous) n = case BS.unpack (BS.take 2 hash) of
+  [0, 0] -> (Hash hash, n)
+  _      -> findNonce content (Hash previous) (n + 1)
  where
   nonce = Enc.encodeUtf8 (Text.pack (show n))
-  h     = SHA256.hash $ foldr BS.append (Enc.encodeUtf8 c) [p, nonce]
+  hash  = SHA256.hash $ BS.concat [(Enc.encodeUtf8 content), previous, nonce]

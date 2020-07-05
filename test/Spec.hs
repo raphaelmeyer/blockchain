@@ -1,50 +1,69 @@
 import           Test.Hspec
 
-import           Blockchain
-import           Data.Text                     as Text
-import           Data.ByteString               as ByteString
+import qualified Blockchain                    as BC
+import qualified Data.Text                     as Text
+import qualified Data.ByteString               as ByteString
 
 main :: IO ()
 main = hspec $ do
-  describe "genesis block" $ do
-    it "has some content" $ do
-      content genesis `shouldBe` Text.pack "Genesis Block"
+  describe "blockchain" $ do
+    it "new blockchain consists of a genesis block" $ do
+      let (BC.Blockchain blocks) = BC.newBlockchain
+      length blocks `shouldBe` 1
 
-    it "has a digest" $ do
-      digest genesis `shouldNotBe` Hash ByteString.empty
+    it "genesis block has no predecessor" $ do
+      let (BC.Blockchain blocks) = BC.newBlockchain
+      BC.blockPrevious (head blocks) `shouldBe` BC.Hash ByteString.empty
 
-    it "has no predecessor" $ do
-      previous genesis `shouldBe` Hash ByteString.empty
+    it "genesis block hash starts with 0000" $ do
+      let (BC.Blockchain blocks) = BC.newBlockchain
+      (show . BC.blockHash . head) blocks `shouldStartWith` "0000"
 
-    it "digest must start with 000" $ do
-      show (digest genesis) `shouldStartWith` "000"
+    it "new blocks are appended" $ do
+      let (BC.Blockchain one) = BC.addBlock BC.newBlockchain Text.empty
+      length one `shouldBe` 2
+      let (BC.Blockchain two) = BC.addBlock (BC.Blockchain one) Text.empty
+      length two `shouldBe` 3
+
+    it "block contains data" $ do
+      let content                = Text.pack "block data"
+      let (BC.Blockchain blocks) = BC.addBlock BC.newBlockchain content
+      (BC.blockContent . last) blocks `shouldBe` content
+
+    it "block hash starts with 0000" $ do
+      let (BC.Blockchain blocks) = BC.addBlock BC.newBlockchain Text.empty
+      (show . BC.blockHash . last) blocks `shouldStartWith` "0000"
+
+    it "blocks are linked to previous blocks" $ do
+      let (BC.Blockchain blocks) =
+            BC.addBlock (BC.addBlock BC.newBlockchain Text.empty) Text.empty
+      BC.blockHash (head blocks) `shouldBe` BC.blockPrevious (blocks !! 1)
+      BC.blockHash (blocks !! 1) `shouldBe` BC.blockPrevious (blocks !! 2)
 
   describe "block" $ do
-    it "contains data" $ do
-      let blockData = Text.pack "Hello World"
-      let block     = newBlock blockData (Hash ByteString.empty)
-      content block `shouldBe` blockData
+    it "block contains data" $ do
+      let content = Text.pack "Hello World"
+      let block   = BC.newBlock content (BC.Hash ByteString.empty)
+      BC.blockContent block `shouldBe` content
 
-    it "has a digest" $ do
-      let block = newBlock (Text.pack "Some data") (Hash ByteString.empty)
-      digest block `shouldNotBe` Hash ByteString.empty
+    it "block has a hash" $ do
+      let block = BC.newBlock Text.empty (BC.Hash ByteString.empty)
+      BC.blockHash block `shouldNotBe` BC.Hash ByteString.empty
 
-    it "has a link to the previous block" $ do
-      let b1 = newBlock (Text.pack "data") (digest genesis)
-      let b2 = newBlock (Text.pack "data") (digest b1)
-      previous b1 `shouldBe` digest genesis
-      previous b2 `shouldBe` digest b1
+    it "block has a link to previous block" $ do
+      let previous = BC.Hash (ByteString.pack [1, 2, 3])
+      let block    = BC.newBlock Text.empty previous
+      BC.blockPrevious block `shouldBe` previous
 
-    it "digest varies with data" $ do
-      let b1 = newBlock (Text.pack "hello") (digest genesis)
-      let b2 = newBlock (Text.pack "world") (digest genesis)
-      digest b1 `shouldNotBe` digest b2
+    it "block hash varies with data" $ do
+      let b1 = BC.newBlock (Text.pack "hello") (BC.Hash ByteString.empty)
+      let b2 = BC.newBlock (Text.pack "world") (BC.Hash ByteString.empty)
+      BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-    it "digest varies with predecessor" $ do
-      let b1 = newBlock (Text.pack "same") (digest genesis)
-      let b2 = newBlock (Text.pack "same") (digest b1)
-      digest b1 `shouldNotBe` digest b2
+    it "block hash varies with predecessor" $ do
+      let b1 = BC.newBlock Text.empty (BC.Hash (ByteString.pack [1, 2, 3, 4]))
+      let b2 = BC.newBlock Text.empty (BC.Hash (ByteString.pack [5, 6, 7, 8]))
+      BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-    it "digest must start with 000" $ do
-      let block = newBlock (Text.pack "some block") (digest genesis)
-      show (digest block) `shouldStartWith` "000"
+  describe "timestamp" $ do
+    it "TODO" pending
