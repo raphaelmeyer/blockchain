@@ -42,9 +42,11 @@ newBlock content previous = Block { blockContent  = content
   where (hash, nonce) = findNonce content previous 0
 
 findNonce :: Text.Text -> Hash -> Nonce -> (Hash, Nonce)
-findNonce content (Hash previous) n = case BS.unpack (BS.take 2 hash) of
-  [0, 0] -> (Hash hash, n)
-  _      -> findNonce content (Hash previous) (n + 1)
+findNonce content (Hash previous) n
+  | BS.take difficulty hash == zeroes = (Hash hash, n)
+  | otherwise = findNonce content (Hash previous) (n + 1)
  where
-  nonce = Enc.encodeUtf8 (Text.pack (show n))
-  hash  = SHA256.hash $ BS.concat [(Enc.encodeUtf8 content), previous, nonce]
+  difficulty = 2
+  zeroes     = BS.replicate difficulty 0
+  nonce      = Enc.encodeUtf8 (Text.pack (show n))
+  hash       = SHA256.hash $ BS.concat [Enc.encodeUtf8 content, previous, nonce]

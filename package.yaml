@@ -35,4 +35,6 @@ tests:
     source-dirs: test
     dependencies:
       - blockchain
+      - bytestring
       - hspec
+      - text
