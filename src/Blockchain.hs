@@ -9,12 +9,13 @@ import           Text.Printf                    ( printf )
 
 newtype Blockchain = Blockchain [Block] deriving (Show, Eq)
 
-newBlockchain :: Blockchain
-newBlockchain = Blockchain [genesis]
+newBlockchain :: IO Blockchain
+newBlockchain = return (Blockchain [genesis])
 
-addBlock :: Blockchain -> Text.Text -> Blockchain
-addBlock (Blockchain blocks) blockData =
-  Blockchain (blocks ++ [newBlock blockData (blockHash (last blocks))])
+addBlock :: Blockchain -> Text.Text -> IO Blockchain
+addBlock (Blockchain blocks) blockData = do
+  let block = newBlock blockData (blockHash (last blocks))
+  return (Blockchain (blocks ++ [block]))
 
 newtype Hash = Hash BS.ByteString deriving (Eq)
 

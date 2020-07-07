@@ -8,35 +8,37 @@ main :: IO ()
 main = hspec $ do
   describe "blockchain" $ do
     it "new blockchain consists of a genesis block" $ do
-      let (BC.Blockchain blocks) = BC.newBlockchain
+      (BC.Blockchain blocks) <- BC.newBlockchain
       length blocks `shouldBe` 1
 
     it "genesis block has no predecessor" $ do
-      let (BC.Blockchain blocks) = BC.newBlockchain
+      (BC.Blockchain blocks) <- BC.newBlockchain
       BC.blockPrevious (head blocks) `shouldBe` BC.Hash ByteString.empty
 
     it "genesis block hash starts with 0000" $ do
-      let (BC.Blockchain blocks) = BC.newBlockchain
+      (BC.Blockchain blocks) <- BC.newBlockchain
       (show . BC.blockHash . head) blocks `shouldStartWith` "0000"
 
     it "new blocks are appended" $ do
-      let (BC.Blockchain one) = BC.addBlock BC.newBlockchain Text.empty
+      (BC.Blockchain one) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
       length one `shouldBe` 2
-      let (BC.Blockchain two) = BC.addBlock (BC.Blockchain one) Text.empty
+      (BC.Blockchain two) <- BC.addBlock (BC.Blockchain one) Text.empty
       length two `shouldBe` 3
 
     it "block contains data" $ do
-      let content                = Text.pack "block data"
-      let (BC.Blockchain blocks) = BC.addBlock BC.newBlockchain content
+      let content = Text.pack "block data"
+      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
       (BC.blockContent . last) blocks `shouldBe` content
 
     it "block hash starts with 0000" $ do
-      let (BC.Blockchain blocks) = BC.addBlock BC.newBlockchain Text.empty
+      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
       (show . BC.blockHash . last) blocks `shouldStartWith` "0000"
 
     it "blocks are linked to previous blocks" $ do
-      let (BC.Blockchain blocks) =
-            BC.addBlock (BC.addBlock BC.newBlockchain Text.empty) Text.empty
+      (BC.Blockchain blocks) <-
+        BC.newBlockchain
+        >>= (`BC.addBlock` Text.empty)
+        >>= (`BC.addBlock` Text.empty)
       BC.blockHash (head blocks) `shouldBe` BC.blockPrevious (blocks !! 1)
       BC.blockHash (blocks !! 1) `shouldBe` BC.blockPrevious (blocks !! 2)
 
