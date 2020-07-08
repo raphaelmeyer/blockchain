@@ -11,7 +11,20 @@ import           Data.Time.Format               ( defaultTimeLocale
                                                 , formatTime
                                                 )
 
-newtype Blockchain = Blockchain [Block] deriving (Show, Eq)
+newtype Blockchain = Blockchain [Block] deriving ( Eq)
+
+data Block = Block {
+  blockContent :: Text.Text,
+  blockHash :: Hash,
+  blockPrevious :: Hash,
+  blockNonce :: Nonce,
+  blockTimestamp :: Timestamp
+} deriving (Eq)
+
+newtype Hash = Hash BS.ByteString deriving (Eq)
+
+type Nonce = Int
+type Timestamp = String
 
 newBlockchain :: IO Blockchain
 newBlockchain = do
@@ -23,22 +36,6 @@ addBlock (Blockchain blocks) blockData = do
   timestamp <- getTimestamp
   let block = newBlock blockData timestamp (blockHash (last blocks))
   return (Blockchain (blocks ++ [block]))
-
-newtype Hash = Hash BS.ByteString deriving (Eq)
-
-instance Show Hash where
-  show (Hash bs) = concatMap (printf "%02x") $ BS.unpack bs
-
-type Nonce = Int
-type Timestamp = String
-
-data Block = Block {
-  blockContent :: Text.Text,
-  blockHash :: Hash,
-  blockPrevious :: Hash,
-  blockNonce :: Nonce,
-  blockTimestamp :: Timestamp
-} deriving (Show, Eq)
 
 genesis :: Timestamp -> Block
 genesis timestamp =
@@ -68,3 +65,16 @@ findNonce given n | BS.take difficulty hash == zeroes = (Hash hash, n)
 
 getTimestamp :: IO Timestamp
 getTimestamp = formatTime defaultTimeLocale "%FT%T%9Q" <$> getCurrentTime
+
+instance Show Blockchain where
+  show (Blockchain blocks) = concatMap ((++ "\n") . show) blocks
+
+instance Show Hash where
+  show (Hash bs) = concatMap (printf "%02x") $ BS.unpack bs
+
+instance Show Block where
+  show block = printf "%13.13v... %v ^%08.8v... %v"
+                      (show . blockHash $ block)
+                      (blockTimestamp block)
+                      (show . blockPrevious $ block)
+                      (blockContent block)

@@ -8,4 +8,6 @@ main =
   BC.newBlockchain
     >>= (`BC.addBlock` Text.pack "hello")
     >>= (`BC.addBlock` Text.pack "world")
+    >>= (`BC.addBlock` Text.pack "this is ...")
+    >>= (`BC.addBlock` Text.pack "... another block")
     >>= print
