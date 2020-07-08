@@ -28,6 +28,7 @@ library:
     - bytestring-conversion
     - cryptohash-sha256
     - text
+    - time
 
 tests:
   test:
@@ -38,3 +39,4 @@ tests:
       - bytestring
       - hspec
       - text
+      - time
