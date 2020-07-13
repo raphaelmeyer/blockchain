@@ -7,7 +7,7 @@ dependencies:
 
 executables:
   blockchain-exe:
-    main: Main.hs
+    main: Main.main
     source-dirs: app
     ghc-options:
       - -Wall
@@ -32,7 +32,7 @@ library:
 
 tests:
   test:
-    main: Spec.hs
+    main: Spec.main
     source-dirs: test
     dependencies:
       - blockchain

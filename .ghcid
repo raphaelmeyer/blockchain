@@ -1,1 +1,3 @@
---command "stack ghci blockchain:lib blockchain:test" --restart "package.yaml" --test "main"
+--command "stack ghci blockchain:lib blockchain:test"
+--restart "package.yaml"
+--test "Spec.main"

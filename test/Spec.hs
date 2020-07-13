@@ -1,3 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+module Spec
+  ( main
+  )
+where
+
 import           Test.Hspec
 
 import qualified Blockchain                    as BC
@@ -31,7 +38,7 @@ main = hspec $ do
       length two `shouldBe` 3
 
     it "block contains data" $ do
-      let content = Text.pack "block data"
+      let content = "block data"
       (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
       (BC.blockContent . last) blocks `shouldBe` content
 
@@ -58,8 +65,8 @@ main = hspec $ do
 
   describe "block" $ do
     it "block contains data" $ do
-      let content = Text.pack "Hello World"
-      let block   = BC.newBlock content "" (BC.Hash ByteString.empty)
+      let content = "Hello World"
+      let block = BC.newBlock content "" (BC.Hash ByteString.empty)
       BC.blockContent block `shouldBe` content
 
     it "block has a hash" $ do
@@ -77,8 +84,8 @@ main = hspec $ do
       BC.blockTimestamp block `shouldBe` timestamp
 
     it "block hash varies with data" $ do
-      let b1 = BC.newBlock (Text.pack "hello") "" (BC.Hash ByteString.empty)
-      let b2 = BC.newBlock (Text.pack "world") "" (BC.Hash ByteString.empty)
+      let b1 = BC.newBlock "hello" "" (BC.Hash ByteString.empty)
+      let b2 = BC.newBlock "world" "" (BC.Hash ByteString.empty)
       BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
     it "block hash varies with predecessor" $ do
