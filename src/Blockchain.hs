@@ -11,7 +11,7 @@ import           Data.Time.Format               ( defaultTimeLocale
                                                 , formatTime
                                                 )
 
-newtype Blockchain = Blockchain [Block] deriving ( Eq)
+newtype Blockchain = Blockchain [Block] deriving (Eq)
 
 data Block = Block {
   blockContent :: Text.Text,
