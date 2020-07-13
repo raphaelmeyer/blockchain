@@ -4,7 +4,9 @@ Blockchain proof of concept.
 
 ## Getting Started
 
+    stack build
     stack test
+    stack run
 
 ## Development Environment
 
