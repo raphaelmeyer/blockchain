@@ -21,8 +21,7 @@ data Block = Block {
   blockTimestamp :: Timestamp
 } deriving (Eq)
 
-newtype Hash = Hash BS.ByteString deriving (Eq)
-
+type Hash = BS.ByteString
 type Nonce = Int
 type Timestamp = String
 
@@ -38,8 +37,7 @@ addBlock (Blockchain blocks) blockData = do
   return (Blockchain (blocks ++ [block]))
 
 genesis :: Timestamp -> Block
-genesis timestamp =
-  newBlock (Text.pack "Genesis Block") timestamp (Hash BS.empty)
+genesis timestamp = newBlock (Text.pack "Genesis Block") timestamp BS.empty
 
 newBlock :: Text.Text -> Timestamp -> Hash -> Block
 newBlock content timestamp previous = Block { blockContent   = content
@@ -49,13 +47,12 @@ newBlock content timestamp previous = Block { blockContent   = content
                                             , blockTimestamp = timestamp
                                             }
  where
-  (Hash prev) = previous
-  given       = BS.concat
-    [Enc.encodeUtf8 content, (Enc.encodeUtf8 . Text.pack) timestamp, prev]
+  given = BS.concat
+    [Enc.encodeUtf8 content, (Enc.encodeUtf8 . Text.pack) timestamp, previous]
   (hash, nonce) = findNonce given 0
 
 findNonce :: BS.ByteString -> Nonce -> (Hash, Nonce)
-findNonce given n | BS.all (== 0) start = (Hash hash, n)
+findNonce given n | BS.all (== 0) start = (hash, n)
                   | otherwise           = findNonce given (n + 1)
  where
   difficulty = 2
@@ -69,12 +66,10 @@ getTimestamp = formatTime defaultTimeLocale "%FT%T%9Q" <$> getCurrentTime
 instance Show Blockchain where
   show (Blockchain blocks) = concatMap ((++ "\n") . show) blocks
 
-instance Show Hash where
-  show (Hash bs) = concatMap (printf "%02x") $ BS.unpack bs
-
 instance Show Block where
   show block = printf "%13.13v... %v ^%08.8v... %v"
-                      (show . blockHash $ block)
+                      (showHex . blockHash $ block)
                       (blockTimestamp block)
-                      (show . blockPrevious $ block)
+                      (showHex . blockPrevious $ block)
                       (blockContent block)
+    where showHex = concatMap (printf "%02x") . BS.unpack :: Hash -> String
