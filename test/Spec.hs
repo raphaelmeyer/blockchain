@@ -11,6 +11,7 @@ import qualified Blockchain                    as BC
 import qualified Data.Text                     as Text
 import qualified Data.ByteString               as ByteString
 
+import           Data.Maybe                     ( isJust )
 import           Data.Time.Clock                ( UTCTime )
 import           Data.Time.Format               ( defaultTimeLocale
                                                 , parseTimeM
@@ -18,52 +19,9 @@ import           Data.Time.Format               ( defaultTimeLocale
 
 main :: IO ()
 main = hspec $ do
-  describe "blockchain" $ do
-    it "new blockchain consists of a genesis block" $ do
-      (BC.Blockchain blocks) <- BC.newBlockchain
-      length blocks `shouldBe` 1
 
-    it "genesis block has no predecessor" $ do
-      (BC.Blockchain blocks) <- BC.newBlockchain
-      BC.blockPrevious (head blocks) `shouldBe` BC.Hash ByteString.empty
+  describe "block definition" $ do
 
-    it "genesis block hash starts with 0000" $ do
-      (BC.Blockchain blocks) <- BC.newBlockchain
-      (show . BC.blockHash . head) blocks `shouldStartWith` "0000"
-
-    it "new blocks are appended" $ do
-      (BC.Blockchain one) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
-      length one `shouldBe` 2
-      (BC.Blockchain two) <- BC.addBlock (BC.Blockchain one) Text.empty
-      length two `shouldBe` 3
-
-    it "block contains data" $ do
-      let content = "block data"
-      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
-      (BC.blockContent . last) blocks `shouldBe` content
-
-    it "block hash starts with 0000" $ do
-      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
-      (show . BC.blockHash . last) blocks `shouldStartWith` "0000"
-
-    it "blocks are linked to previous blocks" $ do
-      (BC.Blockchain [b1, b2, b3]) <-
-        BC.newBlockchain
-        >>= (`BC.addBlock` Text.empty)
-        >>= (`BC.addBlock` Text.empty)
-      BC.blockHash b1 `shouldBe` BC.blockPrevious b2
-      BC.blockHash b2 `shouldBe` BC.blockPrevious b3
-
-    it "blocks are created chronologically" $ do
-      (BC.Blockchain blocks) <-
-        BC.newBlockchain
-        >>= (`BC.addBlock` Text.empty)
-        >>= (`BC.addBlock` Text.empty)
-      let [t1, t2, t3] = map parseTimestamp blocks
-      t1 `shouldSatisfy` (< t2)
-      t2 `shouldSatisfy` (< t3)
-
-  describe "block" $ do
     it "block contains data" $ do
       let content = "Hello World"
       let block = BC.newBlock content "" (BC.Hash ByteString.empty)
@@ -82,6 +40,8 @@ main = hspec $ do
       let timestamp = "2008-10-31T18:10:00.000000000"
       let block = BC.newBlock Text.empty timestamp (BC.Hash ByteString.empty)
       BC.blockTimestamp block `shouldBe` timestamp
+
+  describe "block properties" $ do
 
     it "block hash varies with data" $ do
       let b1 = BC.newBlock "hello" "" (BC.Hash ByteString.empty)
@@ -103,6 +63,60 @@ main = hspec $ do
                            "2009-01-03T19:15:00.000000000"
                            (BC.Hash ByteString.empty)
       BC.blockHash b1 `shouldNotBe` BC.blockHash b2
+
+  describe "new blockchain" $ do
+
+    it "new blockchain consists of a genesis block" $ do
+      (BC.Blockchain [block]) <- BC.newBlockchain
+      BC.blockContent block `shouldBe` "Genesis Block"
+
+    it "genesis block has no predecessor" $ do
+      (BC.Blockchain [block]) <- BC.newBlockchain
+      BC.blockPrevious block `shouldBe` BC.Hash ByteString.empty
+
+    it "genesis block has a valid timestamp" $ do
+      (BC.Blockchain [block]) <- BC.newBlockchain
+      parseTimestamp block `shouldSatisfy` isJust
+
+  describe "adding new blocks" $ do
+
+    it "new blocks are appended" $ do
+      (BC.Blockchain one) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
+      length one `shouldBe` 2
+      (BC.Blockchain two) <- BC.addBlock (BC.Blockchain one) Text.empty
+      length two `shouldBe` 3
+
+    it "block contains data" $ do
+      let content = "block data"
+      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
+      (BC.blockContent . last) blocks `shouldBe` content
+
+    it "blocks are linked to previous blocks" $ do
+      (BC.Blockchain [b1, b2, b3]) <-
+        BC.newBlockchain
+        >>= (`BC.addBlock` Text.empty)
+        >>= (`BC.addBlock` Text.empty)
+      BC.blockHash b1 `shouldBe` BC.blockPrevious b2
+      BC.blockHash b2 `shouldBe` BC.blockPrevious b3
+
+    it "blocks are created chronologically" $ do
+      (BC.Blockchain blocks) <-
+        BC.newBlockchain
+        >>= (`BC.addBlock` Text.empty)
+        >>= (`BC.addBlock` Text.empty)
+      let [t1, t2, t3] = map parseTimestamp blocks
+      t1 `shouldSatisfy` (< t2)
+      t2 `shouldSatisfy` (< t3)
+
+  describe "proof of work" $ do
+
+    it "genesis block hash starts with 0000" $ do
+      (BC.Blockchain blocks) <- BC.newBlockchain
+      (show . BC.blockHash . head) blocks `shouldStartWith` "0000"
+
+    it "block hash starts with 0000" $ do
+      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
+      (show . BC.blockHash . last) blocks `shouldStartWith` "0000"
 
 parseTimestamp :: BC.Block -> Maybe UTCTime
 parseTimestamp =
