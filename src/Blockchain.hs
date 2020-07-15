@@ -55,11 +55,11 @@ newBlock content timestamp previous = Block { blockContent   = content
   (hash, nonce) = findNonce given 0
 
 findNonce :: BS.ByteString -> Nonce -> (Hash, Nonce)
-findNonce given n | BS.take difficulty hash == zeroes = (Hash hash, n)
-                  | otherwise                         = findNonce given (n + 1)
+findNonce given n | BS.all (== 0) start = (Hash hash, n)
+                  | otherwise           = findNonce given (n + 1)
  where
   difficulty = 2
-  zeroes     = BS.replicate difficulty 0
+  start      = BS.take difficulty hash
   nonce      = (Enc.encodeUtf8 . Text.pack . show) n
   hash       = SHA256.hash $ BS.concat [given, nonce]
 
