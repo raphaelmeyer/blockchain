@@ -11,6 +11,8 @@ import qualified Data.Text.Encoding            as Enc
 --                                                 , formatTime
 --                                                 )
 
+newtype Blockchain = Blockchain [Block]
+
 data Block = Block {
   blockHash :: Hash,
   blockContent :: Text.Text,
@@ -20,6 +22,9 @@ data Block = Block {
 
 type Hash = BS.ByteString
 type Timestamp = String
+
+newBlockchain :: IO Blockchain
+newBlockchain = return (Blockchain [])
 
 newBlock :: Text.Text -> Timestamp -> Hash -> Block
 newBlock content timestamp previous = Block { blockHash      = hash

@@ -11,11 +11,11 @@ import qualified Blockchain                    as BC
 import qualified Data.Text                     as Text
 import qualified Data.ByteString               as ByteString
 
--- import           Data.Maybe                     ( isJust )
--- import           Data.Time.Clock                ( UTCTime )
--- import           Data.Time.Format               ( defaultTimeLocale
---                                                 , parseTimeM
---                                                 )
+import           Data.Maybe                     ( isJust )
+import           Data.Time.Clock                ( UTCTime )
+import           Data.Time.Format               ( defaultTimeLocale
+                                                , parseTimeM
+                                                )
 
 main :: IO ()
 main = hspec $ do
@@ -67,19 +67,16 @@ main = hspec $ do
   describe "creating a new blockchain" $ do
 
     it "new blockchain consists of a genesis block" $ do
-      pending
-      -- (BC.Blockchain [block]) <- BC.newBlockchain
-      -- BC.blockContent block `shouldBe` "Genesis Block"
+      (BC.Blockchain [block]) <- BC.newBlockchain
+      BC.blockContent block `shouldBe` "Genesis Block"
 
     it "a genesis block has no previous block" $ do
-      pending
-      -- (BC.Blockchain [block]) <- BC.newBlockchain
-      -- BC.blockPrevious block `shouldBe` ByteString.empty
+      (BC.Blockchain [block]) <- BC.newBlockchain
+      BC.blockPrevious block `shouldBe` ByteString.empty
 
     it "a genesis block has a valid timestamp" $ do
-      pending
-      -- (BC.Blockchain [block]) <- BC.newBlockchain
-      -- parseTimestamp block `shouldSatisfy` isJust
+      (BC.Blockchain [block]) <- BC.newBlockchain
+      parseTimestamp block `shouldSatisfy` isJust
 
   -- describe "adding new blocks" $ do
 
@@ -122,6 +119,6 @@ main = hspec $ do
   --     (ByteString.unpack . BC.blockHash . head) blocks `shouldStartWith` [0, 0]
   --     (ByteString.unpack . BC.blockHash . last) blocks `shouldStartWith` [0, 0]
 
--- parseTimestamp :: BC.Block -> Maybe UTCTime
--- parseTimestamp =
---   parseTimeM True defaultTimeLocale "%FT%T%Q" . BC.blockTimestamp
+parseTimestamp :: BC.Block -> Maybe UTCTime
+parseTimestamp =
+  parseTimeM True defaultTimeLocale "%FT%T%Q" . BC.blockTimestamp
