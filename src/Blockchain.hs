@@ -14,11 +14,11 @@ import           Data.Time.Format               ( defaultTimeLocale
 newtype Blockchain = Blockchain [Block] deriving (Eq)
 
 data Block = Block {
-  blockContent :: Text.Text,
   blockHash :: Hash,
+  blockContent :: Text.Text,
+  blockTimestamp :: Timestamp,
   blockPrevious :: Hash,
-  blockNonce :: Nonce,
-  blockTimestamp :: Timestamp
+  blockNonce :: Nonce
 } deriving (Eq)
 
 type Hash = BS.ByteString
@@ -28,7 +28,7 @@ type Timestamp = String
 newBlockchain :: IO Blockchain
 newBlockchain = do
   timestamp <- getTimestamp
-  return (Blockchain [genesis timestamp])
+  return (Blockchain [newBlock (Text.pack "Genesis Block") timestamp BS.empty])
 
 addBlock :: Blockchain -> Text.Text -> IO Blockchain
 addBlock (Blockchain blocks) blockData = do
@@ -36,15 +36,12 @@ addBlock (Blockchain blocks) blockData = do
   let block = newBlock blockData timestamp (blockHash (last blocks))
   return (Blockchain (blocks ++ [block]))
 
-genesis :: Timestamp -> Block
-genesis timestamp = newBlock (Text.pack "Genesis Block") timestamp BS.empty
-
 newBlock :: Text.Text -> Timestamp -> Hash -> Block
-newBlock content timestamp previous = Block { blockContent   = content
-                                            , blockHash      = hash
+newBlock content timestamp previous = Block { blockHash      = hash
+                                            , blockContent   = content
+                                            , blockTimestamp = timestamp
                                             , blockPrevious  = previous
                                             , blockNonce     = nonce
-                                            , blockTimestamp = timestamp
                                             }
  where
   given = BS.concat
