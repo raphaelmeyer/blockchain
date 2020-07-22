@@ -11,7 +11,7 @@ import           Data.Time.Format               ( defaultTimeLocale
                                                 , formatTime
                                                 )
 
-newtype Blockchain = Blockchain [Block] deriving (Eq)
+newtype Blockchain = Blockchain [Block]
 
 data Block = Block {
   blockHash :: Hash,
@@ -19,7 +19,7 @@ data Block = Block {
   blockTimestamp :: Timestamp,
   blockPrevious :: Hash,
   blockNonce :: Nonce
-} deriving (Eq)
+}
 
 type Hash = BS.ByteString
 type Nonce = Int
