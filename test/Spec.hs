@@ -20,40 +20,40 @@ import           Data.Time.Format               ( defaultTimeLocale
 main :: IO ()
 main = hspec $ do
 
-  describe "block definition" $ do
+  describe "definition of a single block" $ do
 
-    it "block contains data" $ do
+    it "a block stores some kind of data" $ do
       let content = "Hello World"
       let block   = BC.newBlock content "" ByteString.empty
       BC.blockContent block `shouldBe` content
 
-    it "block has a hash" $ do
+    it "a block contains a hash" $ do
       let block = BC.newBlock Text.empty "" ByteString.empty
       BC.blockHash block `shouldNotBe` ByteString.empty
 
-    it "block has a link to previous block" $ do
+    it "a block stores the hash of the previous block" $ do
       let previous = ByteString.pack [1, 2, 3]
       let block    = BC.newBlock Text.empty "" previous
       BC.blockPrevious block `shouldBe` previous
 
-    it "block has a timestamp" $ do
+    it "a block has a timestamp" $ do
       let timestamp = "2008-10-31T18:10:00.000000000"
       let block     = BC.newBlock Text.empty timestamp ByteString.empty
       BC.blockTimestamp block `shouldBe` timestamp
 
-  describe "block properties" $ do
+  describe "properties of the hash of a block" $ do
 
-    it "block hash varies with data" $ do
+    it "the hash varies with the stored data" $ do
       let b1 = BC.newBlock "hello" "" ByteString.empty
       let b2 = BC.newBlock "world" "" ByteString.empty
       BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-    it "block hash varies with predecessor" $ do
+    it "the hash varies with the hash of the previous block" $ do
       let b1 = BC.newBlock Text.empty "" (ByteString.pack [1, 2, 3, 4])
       let b2 = BC.newBlock Text.empty "" (ByteString.pack [5, 6, 7, 8])
       BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-    it "block hash varies with timestamp" $ do
+    it "the hash varies with different timestamp" $ do
       let
         b1 = BC.newBlock Text.empty
                          "2008-10-31T18:10:00.000000000"
@@ -64,17 +64,17 @@ main = hspec $ do
                          ByteString.empty
       BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-  describe "new blockchain" $ do
+  describe "creating a new blockchain" $ do
 
     it "new blockchain consists of a genesis block" $ do
       (BC.Blockchain [block]) <- BC.newBlockchain
       BC.blockContent block `shouldBe` "Genesis Block"
 
-    it "genesis block has no predecessor" $ do
+    it "a genesis block has no previous block" $ do
       (BC.Blockchain [block]) <- BC.newBlockchain
       BC.blockPrevious block `shouldBe` ByteString.empty
 
-    it "genesis block has a valid timestamp" $ do
+    it "a genesis block has a valid timestamp" $ do
       (BC.Blockchain [block]) <- BC.newBlockchain
       parseTimestamp block `shouldSatisfy` isJust
 
@@ -86,12 +86,12 @@ main = hspec $ do
       (BC.Blockchain two) <- BC.addBlock (BC.Blockchain one) Text.empty
       length two `shouldBe` 3
 
-    it "block contains data" $ do
+    it "a new block contains some data" $ do
       let content = "block data"
       (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
       (BC.blockContent . last) blocks `shouldBe` content
 
-    it "blocks are linked to previous blocks" $ do
+    it "any new block contains the hash of the previous block" $ do
       (BC.Blockchain [b1, b2, b3]) <-
         BC.newBlockchain
         >>= (`BC.addBlock` Text.empty)
@@ -99,7 +99,7 @@ main = hspec $ do
       BC.blockHash b1 `shouldBe` BC.blockPrevious b2
       BC.blockHash b2 `shouldBe` BC.blockPrevious b3
 
-    it "blocks are created chronologically" $ do
+    it "new blocks are ordered chronologically" $ do
       (BC.Blockchain blocks) <-
         BC.newBlockchain
         >>= (`BC.addBlock` Text.empty)
@@ -110,11 +110,9 @@ main = hspec $ do
 
   describe "proof of work" $ do
 
-    it "genesis block hash starts with 0000" $ do
-      (BC.Blockchain blocks) <- BC.newBlockchain
-      (ByteString.unpack . BC.blockHash . head) blocks `shouldStartWith` [0, 0]
-    it "block hash starts with 0000" $ do
+    it "all block hashes start with two 0 bytes" $ do
       (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
+      (ByteString.unpack . BC.blockHash . head) blocks `shouldStartWith` [0, 0]
       (ByteString.unpack . BC.blockHash . last) blocks `shouldStartWith` [0, 0]
 
 parseTimestamp :: BC.Block -> Maybe UTCTime
