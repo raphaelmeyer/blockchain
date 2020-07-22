@@ -41,28 +41,28 @@ main = hspec $ do
       let block    = BC.newBlock Text.empty "" previous
       BC.blockPrevious block `shouldBe` previous
 
-  -- describe "properties of the hash of a block" $ do
+  describe "properties of the hash of a block" $ do
 
-  --   it "the hash varies with the stored data" $ do
-  --     let b1 = BC.newBlock "hello" "" ByteString.empty
-  --     let b2 = BC.newBlock "world" "" ByteString.empty
-  --     BC.blockHash b1 `shouldNotBe` BC.blockHash b2
+    it "the hash varies with the stored data" $ do
+      let b1 = BC.newBlock "hello" "" ByteString.empty
+      let b2 = BC.newBlock "world" "" ByteString.empty
+      BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-  --   it "the hash varies with different timestamp" $ do
-  --     let
-  --       b1 = BC.newBlock Text.empty
-  --                        "2008-10-31T18:10:00.000000000"
-  --                        ByteString.empty
-  --     let
-  --       b2 = BC.newBlock Text.empty
-  --                        "2009-01-03T19:15:00.000000000"
-  --                        ByteString.empty
-  --     BC.blockHash b1 `shouldNotBe` BC.blockHash b2
+    it "the hash varies with different timestamp" $ do
+      let
+        b1 = BC.newBlock Text.empty
+                         "2008-10-31T18:10:00.000000000"
+                         ByteString.empty
+      let
+        b2 = BC.newBlock Text.empty
+                         "2009-01-03T19:15:00.000000000"
+                         ByteString.empty
+      BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-  --   it "the hash varies with the hash of the previous block" $ do
-  --     let b1 = BC.newBlock Text.empty "" (ByteString.pack [1, 2, 3, 4])
-  --     let b2 = BC.newBlock Text.empty "" (ByteString.pack [5, 6, 7, 8])
-  --     BC.blockHash b1 `shouldNotBe` BC.blockHash b2
+    it "the hash varies with the hash of the previous block" $ do
+      let b1 = BC.newBlock Text.empty "" (ByteString.pack [1, 2, 3, 4])
+      let b2 = BC.newBlock Text.empty "" (ByteString.pack [5, 6, 7, 8])
+      BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
   -- describe "creating a new blockchain" $ do
 
