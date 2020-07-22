@@ -22,8 +22,8 @@ type Hash = BS.ByteString
 type Timestamp = String
 
 newBlock :: Text.Text -> Timestamp -> Hash -> Block
-newBlock _ _ _ = Block { blockHash      = BS.empty
-                       , blockContent   = Text.pack ""
-                       , blockTimestamp = ""
-                       , blockPrevious  = BS.empty
-                       }
+newBlock content timestamp previous = Block { blockHash      = BS.pack [1, 2, 3]
+                                            , blockContent   = content
+                                            , blockTimestamp = timestamp
+                                            , blockPrevious  = previous
+                                            }
