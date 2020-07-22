@@ -1,8 +1,8 @@
 module Blockchain where
 
 -- import qualified Crypto.Hash.SHA256            as SHA256
--- import qualified Data.ByteString               as BS
--- import qualified Data.Text                     as Text
+import qualified Data.ByteString               as BS
+import qualified Data.Text                     as Text
 -- import qualified Data.Text.Encoding            as Enc
 
 -- import           Text.Printf                    ( printf )
@@ -10,3 +10,20 @@ module Blockchain where
 -- import           Data.Time.Format               ( defaultTimeLocale
 --                                                 , formatTime
 --                                                 )
+
+data Block = Block {
+  blockHash :: Hash,
+  blockContent :: Text.Text,
+  blockTimestamp :: Timestamp,
+  blockPrevious :: Hash
+}
+
+type Hash = BS.ByteString
+type Timestamp = String
+
+newBlock :: Text.Text -> Timestamp -> Hash -> Block
+newBlock _ _ _ = Block { blockHash      = BS.empty
+                       , blockContent   = Text.pack ""
+                       , blockTimestamp = ""
+                       , blockPrevious  = BS.empty
+                       }

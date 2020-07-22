@@ -7,9 +7,9 @@ where
 
 import           Test.Hspec
 
--- import qualified Blockchain                    as BC
--- import qualified Data.Text                     as Text
--- import qualified Data.ByteString               as ByteString
+import qualified Blockchain                    as BC
+import qualified Data.Text                     as Text
+import qualified Data.ByteString               as ByteString
 
 -- import           Data.Maybe                     ( isJust )
 -- import           Data.Time.Clock                ( UTCTime )
@@ -23,27 +23,23 @@ main = hspec $ do
   describe "definition of a single block" $ do
 
     it "a block contains a hash" $ do
-      pending
-      -- let block = BC.newBlock Text.empty "" ByteString.empty
-      -- BC.blockHash block `shouldNotBe` ByteString.empty
+      let block = BC.newBlock Text.empty "" ByteString.empty
+      BC.blockHash block `shouldNotBe` ByteString.empty
 
     it "a block stores some kind of data" $ do
-      pending
-      -- let content = "Hello World"
-      -- let block   = BC.newBlock content "" ByteString.empty
-      -- BC.blockContent block `shouldBe` content
+      let content = "Hello World"
+      let block   = BC.newBlock content "" ByteString.empty
+      BC.blockContent block `shouldBe` content
 
     it "a block has a timestamp" $ do
-      pending
-      -- let timestamp = "2008-10-31T18:10:00.000000000"
-      -- let block     = BC.newBlock Text.empty timestamp ByteString.empty
-      -- BC.blockTimestamp block `shouldBe` timestamp
+      let timestamp = "2008-10-31T18:10:00.000000000"
+      let block     = BC.newBlock Text.empty timestamp ByteString.empty
+      BC.blockTimestamp block `shouldBe` timestamp
 
     it "a block stores the hash of the previous block" $ do
-      pending
-      -- let previous = ByteString.pack [1, 2, 3]
-      -- let block    = BC.newBlock Text.empty "" previous
-      -- BC.blockPrevious block `shouldBe` previous
+      let previous = ByteString.pack [1, 2, 3]
+      let block    = BC.newBlock Text.empty "" previous
+      BC.blockPrevious block `shouldBe` previous
 
   -- describe "properties of the hash of a block" $ do
 
