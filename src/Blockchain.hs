@@ -5,7 +5,7 @@ import qualified Data.ByteString               as BS
 import qualified Data.Text                     as Text
 import qualified Data.Text.Encoding            as Enc
 
--- import           Text.Printf                    ( printf )
+import           Text.Printf                    ( printf )
 import           Data.Time.Clock                ( getCurrentTime )
 import           Data.Time.Format               ( defaultTimeLocale
                                                 , formatTime
@@ -59,3 +59,14 @@ findNonce given n | BS.all (== 0) start = (n, hash)
 
 getTimestamp :: IO Timestamp
 getTimestamp = formatTime defaultTimeLocale "%FT%T%9Q" <$> getCurrentTime
+
+instance Show Blockchain where
+  show (Blockchain blocks) = concatMap ((++ "\n") . show) blocks
+
+instance Show Block where
+  show block = printf "%13.13v... %v ^%08.8v... %v"
+                      (showHex . blockHash $ block)
+                      (blockTimestamp block)
+                      (showHex . blockPrevious $ block)
+                      (blockContent block)
+    where showHex = concatMap (printf "%02x") . BS.unpack :: Hash -> String
