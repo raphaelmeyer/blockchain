@@ -17,11 +17,13 @@ data Block = Block {
   blockHash :: Hash,
   blockContent :: Text.Text,
   blockTimestamp :: Timestamp,
-  blockPrevious :: Hash
+  blockPrevious :: Hash,
+  blockNonce :: Nonce
 }
 
 type Hash = BS.ByteString
 type Timestamp = String
+type Nonce = Int
 
 newBlockchain :: IO Blockchain
 newBlockchain = do
@@ -39,10 +41,21 @@ newBlock content timestamp previous = Block { blockHash      = hash
                                             , blockContent   = content
                                             , blockTimestamp = timestamp
                                             , blockPrevious  = previous
+                                            , blockNonce     = nonce
                                             }
  where
-  hash = SHA256.hash $ BS.concat
+  given = BS.concat
     [Enc.encodeUtf8 content, Enc.encodeUtf8 . Text.pack $ timestamp, previous]
+  (nonce, hash) = findNonce given 0
+
+findNonce :: BS.ByteString -> Nonce -> (Nonce, Hash)
+findNonce given n | BS.all (== 0) start = (n, hash)
+                  | otherwise           = findNonce given (n + 1)
+ where
+  difficulty = 2
+  start      = BS.take difficulty hash
+  nonce      = Enc.encodeUtf8 . Text.pack . show $ n
+  hash       = SHA256.hash $ BS.concat [given, nonce]
 
 getTimestamp :: IO Timestamp
 getTimestamp = formatTime defaultTimeLocale "%FT%T%9Q" <$> getCurrentTime
