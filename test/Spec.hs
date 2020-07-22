@@ -64,22 +64,22 @@ main = hspec $ do
       let b2 = BC.newBlock Text.empty "" (ByteString.pack [5, 6, 7, 8])
       BC.blockHash b1 `shouldNotBe` BC.blockHash b2
 
-  -- describe "creating a new blockchain" $ do
+  describe "creating a new blockchain" $ do
 
-  --   it "new blockchain consists of a genesis block" $ do
-  --     pending
-  --     -- (BC.Blockchain [block]) <- BC.newBlockchain
-  --     -- BC.blockContent block `shouldBe` "Genesis Block"
+    it "new blockchain consists of a genesis block" $ do
+      pending
+      -- (BC.Blockchain [block]) <- BC.newBlockchain
+      -- BC.blockContent block `shouldBe` "Genesis Block"
 
-  --   it "a genesis block has no previous block" $ do
-  --     pending
-  --     -- (BC.Blockchain [block]) <- BC.newBlockchain
-  --     -- BC.blockPrevious block `shouldBe` ByteString.empty
+    it "a genesis block has no previous block" $ do
+      pending
+      -- (BC.Blockchain [block]) <- BC.newBlockchain
+      -- BC.blockPrevious block `shouldBe` ByteString.empty
 
-  --   it "a genesis block has a valid timestamp" $ do
-  --     pending
-  --     -- (BC.Blockchain [block]) <- BC.newBlockchain
-  --     -- parseTimestamp block `shouldSatisfy` isJust
+    it "a genesis block has a valid timestamp" $ do
+      pending
+      -- (BC.Blockchain [block]) <- BC.newBlockchain
+      -- parseTimestamp block `shouldSatisfy` isJust
 
   -- describe "adding new blocks" $ do
 
