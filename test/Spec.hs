@@ -81,36 +81,32 @@ main = hspec $ do
   describe "adding new blocks" $ do
 
     it "new blocks are appended" $ do
-      pending
-      -- (BC.Blockchain one) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
-      -- length one `shouldBe` 2
-      -- (BC.Blockchain two) <- BC.addBlock (BC.Blockchain one) Text.empty
-      -- length two `shouldBe` 3
+      (BC.Blockchain one) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
+      length one `shouldBe` 2
+      (BC.Blockchain two) <- BC.addBlock (BC.Blockchain one) Text.empty
+      length two `shouldBe` 3
 
     it "a new block contains some data" $ do
-      pending
-      -- let content = "block data"
-      -- (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
-      -- (BC.blockContent . last) blocks `shouldBe` content
+      let content = "block data"
+      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` content)
+      (BC.blockContent . last) blocks `shouldBe` content
 
     it "any new block contains the hash of the previous block" $ do
-      pending
-      -- (BC.Blockchain [b1, b2, b3]) <-
-      --   BC.newBlockchain
-      --   >>= (`BC.addBlock` Text.empty)
-      --   >>= (`BC.addBlock` Text.empty)
-      -- BC.blockHash b1 `shouldBe` BC.blockPrevious b2
-      -- BC.blockHash b2 `shouldBe` BC.blockPrevious b3
+      (BC.Blockchain [b1, b2, b3]) <-
+        BC.newBlockchain
+        >>= (`BC.addBlock` Text.empty)
+        >>= (`BC.addBlock` Text.empty)
+      BC.blockHash b1 `shouldBe` BC.blockPrevious b2
+      BC.blockHash b2 `shouldBe` BC.blockPrevious b3
 
     it "new blocks are ordered chronologically" $ do
-      pending
-      -- (BC.Blockchain blocks) <-
-      --   BC.newBlockchain
-      --   >>= (`BC.addBlock` Text.empty)
-      --   >>= (`BC.addBlock` Text.empty)
-      -- let [t1, t2, t3] = map parseTimestamp blocks
-      -- t1 `shouldSatisfy` (< t2)
-      -- t2 `shouldSatisfy` (< t3)
+      (BC.Blockchain blocks) <-
+        BC.newBlockchain
+        >>= (`BC.addBlock` Text.empty)
+        >>= (`BC.addBlock` Text.empty)
+      let [t1, t2, t3] = map parseTimestamp blocks
+      t1 `shouldSatisfy` (< t2)
+      t2 `shouldSatisfy` (< t3)
 
   -- describe "proof of work" $ do
 

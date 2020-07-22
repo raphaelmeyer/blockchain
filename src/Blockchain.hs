@@ -28,6 +28,9 @@ newBlockchain = do
   timestamp <- getTimestamp
   return (Blockchain [newBlock (Text.pack "Genesis Block") timestamp BS.empty])
 
+addBlock :: Blockchain -> Text.Text -> IO Blockchain
+addBlock blockchain _ = return blockchain
+
 newBlock :: Text.Text -> Timestamp -> Hash -> Block
 newBlock content timestamp previous = Block { blockHash      = hash
                                             , blockContent   = content
