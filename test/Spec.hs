@@ -108,12 +108,12 @@ main = hspec $ do
       t1 `shouldSatisfy` (< t2)
       t2 `shouldSatisfy` (< t3)
 
-  -- describe "proof of work" $ do
+  describe "proof of work" $ do
 
-  --   it "all block hashes start with two 0 bytes" $ do
-  --     (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
-  --     (ByteString.unpack . BC.blockHash . head) blocks `shouldStartWith` [0, 0]
-  --     (ByteString.unpack . BC.blockHash . last) blocks `shouldStartWith` [0, 0]
+    it "all block hashes start with two 0 bytes" $ do
+      (BC.Blockchain blocks) <- BC.newBlockchain >>= (`BC.addBlock` Text.empty)
+      (ByteString.unpack . BC.blockHash . head) blocks `shouldStartWith` [0, 0]
+      (ByteString.unpack . BC.blockHash . last) blocks `shouldStartWith` [0, 0]
 
 parseTimestamp :: BC.Block -> Maybe UTCTime
 parseTimestamp =
