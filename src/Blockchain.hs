@@ -6,10 +6,10 @@ import qualified Data.Text                     as Text
 import qualified Data.Text.Encoding            as Enc
 
 -- import           Text.Printf                    ( printf )
--- import           Data.Time.Clock                ( getCurrentTime )
--- import           Data.Time.Format               ( defaultTimeLocale
---                                                 , formatTime
---                                                 )
+import           Data.Time.Clock                ( getCurrentTime )
+import           Data.Time.Format               ( defaultTimeLocale
+                                                , formatTime
+                                                )
 
 newtype Blockchain = Blockchain [Block]
 
@@ -24,7 +24,9 @@ type Hash = BS.ByteString
 type Timestamp = String
 
 newBlockchain :: IO Blockchain
-newBlockchain = return (Blockchain [])
+newBlockchain = do
+  timestamp <- getTimestamp
+  return (Blockchain [newBlock (Text.pack "Genesis Block") timestamp BS.empty])
 
 newBlock :: Text.Text -> Timestamp -> Hash -> Block
 newBlock content timestamp previous = Block { blockHash      = hash
@@ -35,3 +37,6 @@ newBlock content timestamp previous = Block { blockHash      = hash
  where
   hash = SHA256.hash $ BS.concat
     [Enc.encodeUtf8 content, Enc.encodeUtf8 . Text.pack $ timestamp, previous]
+
+getTimestamp :: IO Timestamp
+getTimestamp = formatTime defaultTimeLocale "%FT%T%9Q" <$> getCurrentTime
